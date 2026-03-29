@@ -1,0 +1,352 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "MCP Trust Kit",
+          "semanticVersion": "0.3.0",
+          "rules": [
+            {
+              "id": "duplicate_tool_names",
+              "name": "Duplicate tool names",
+              "shortDescription": {
+                "text": "Duplicate tool names"
+              },
+              "fullDescription": {
+                "text": "Tool names should be unique within one MCP server."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "help": {
+                "text": "Tool names should be unique within one MCP server. Severity: error. Score impact: 20."
+              },
+              "properties": {
+                "tags": [
+                  "tools",
+                  "identity",
+                  "tool-identity",
+                  "tool_surface"
+                ],
+                "precision": "medium",
+                "problem.severity": "error",
+                "score_category": "tool_surface",
+                "score_impact": 20
+              }
+            },
+            {
+              "id": "missing_tool_description",
+              "name": "Missing tool description",
+              "shortDescription": {
+                "text": "Missing tool description"
+              },
+              "fullDescription": {
+                "text": "Each tool should include a non-empty description."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "help": {
+                "text": "Each tool should include a non-empty description. Severity: warning. Score impact: 10."
+              },
+              "properties": {
+                "tags": [
+                  "tools",
+                  "description",
+                  "tool-description",
+                  "tool_surface"
+                ],
+                "precision": "medium",
+                "problem.severity": "warning",
+                "score_category": "tool_surface",
+                "score_impact": 10
+              }
+            },
+            {
+              "id": "vague_tool_description",
+              "name": "Vague tool description",
+              "shortDescription": {
+                "text": "Vague tool description"
+              },
+              "fullDescription": {
+                "text": "Tool descriptions should clearly explain what the tool does."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "help": {
+                "text": "Tool descriptions should clearly explain what the tool does. Severity: warning. Score impact: 10."
+              },
+              "properties": {
+                "tags": [
+                  "tools",
+                  "description",
+                  "tool-description",
+                  "tool_surface"
+                ],
+                "precision": "medium",
+                "problem.severity": "warning",
+                "score_category": "tool_surface",
+                "score_impact": 10
+              }
+            },
+            {
+              "id": "weak_input_schema",
+              "name": "Weak input schema",
+              "shortDescription": {
+                "text": "Weak input schema"
+              },
+              "fullDescription": {
+                "text": "Tool input schemas should constrain accepted input clearly."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "help": {
+                "text": "Tool input schemas should constrain accepted input clearly. Severity: warning. Score impact: 10."
+              },
+              "properties": {
+                "tags": [
+                  "schema",
+                  "validation",
+                  "input-schema",
+                  "tool_surface"
+                ],
+                "precision": "medium",
+                "problem.severity": "warning",
+                "score_category": "tool_surface",
+                "score_impact": 10
+              }
+            },
+            {
+              "id": "dangerous_exec_tool",
+              "name": "Dangerous execution tool",
+              "shortDescription": {
+                "text": "Dangerous execution tool"
+              },
+              "fullDescription": {
+                "text": "Tools that execute host shell commands are high risk."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "help": {
+                "text": "Tools that execute host shell commands are high risk. Severity: error. Score impact: 20."
+              },
+              "properties": {
+                "tags": [
+                  "capability",
+                  "execution",
+                  "tool_surface"
+                ],
+                "precision": "medium",
+                "problem.severity": "error",
+                "score_category": "tool_surface",
+                "score_impact": 20
+              }
+            },
+            {
+              "id": "dangerous_fs_write_tool",
+              "name": "Dangerous filesystem write tool",
+              "shortDescription": {
+                "text": "Dangerous filesystem write tool"
+              },
+              "fullDescription": {
+                "text": "Tools that write files on disk are high risk."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "help": {
+                "text": "Tools that write files on disk are high risk. Severity: error. Score impact: 20."
+              },
+              "properties": {
+                "tags": [
+                  "capability",
+                  "filesystem",
+                  "tool_surface"
+                ],
+                "precision": "medium",
+                "problem.severity": "error",
+                "score_category": "tool_surface",
+                "score_impact": 20
+              }
+            }
+          ]
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "workingDirectory": {
+            "uri": "file:///D:/Dev/MCP%20Trust%20Kit"
+          }
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "vague_tool_description",
+          "ruleIndex": 2,
+          "level": "warning",
+          "message": {
+            "text": "Tool 'do_it' uses a vague description that does not explain its behavior clearly."
+          },
+          "partialFingerprints": {
+            "primaryLocationLineHash": "d4baaac7a1cf5eaf452c3c70de57a85ea47f3401ea40321d2c82f1b99ae07971"
+          },
+          "properties": {
+            "score_category": "tool_surface",
+            "score_impact": 10,
+            "tool_name": "do_it",
+            "finding_category": "tool-description",
+            "evidence": [
+              "description='Helps with stuff.'",
+              "word_count=3",
+              "matched_phrase='helps with stuff'"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/insecure-server/server.py"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              },
+              "message": {
+                "text": "description='Helps with stuff.'"
+              }
+            }
+          ],
+          "rule": {
+            "id": "vague_tool_description"
+          }
+        },
+        {
+          "ruleId": "weak_input_schema",
+          "ruleIndex": 3,
+          "level": "warning",
+          "message": {
+            "text": "Tool 'debug_payload' exposes a weak input schema that accepts poorly constrained input."
+          },
+          "partialFingerprints": {
+            "primaryLocationLineHash": "2d6880eb9f5a310c37f53f3eb0de96209ada15a1fad22d5191eff31cf657d787"
+          },
+          "properties": {
+            "score_category": "tool_surface",
+            "score_impact": 10,
+            "tool_name": "debug_payload",
+            "finding_category": "input-schema",
+            "evidence": [
+              "additionalProperties=True",
+              "properties=<missing-or-empty>"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/insecure-server/server.py"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              },
+              "message": {
+                "text": "additionalProperties=True"
+              }
+            }
+          ],
+          "rule": {
+            "id": "weak_input_schema"
+          }
+        },
+        {
+          "ruleId": "dangerous_exec_tool",
+          "ruleIndex": 4,
+          "level": "error",
+          "message": {
+            "text": "Tool 'exec_command' appears to expose host command execution."
+          },
+          "partialFingerprints": {
+            "primaryLocationLineHash": "72ef9a2139b24a15d49158424b19f5fb9a89a07d27f66c25278d490f6543dc09"
+          },
+          "properties": {
+            "score_category": "tool_surface",
+            "score_impact": 20,
+            "tool_name": "exec_command",
+            "finding_category": "capability",
+            "evidence": [
+              "name_markers=['exec', 'command']",
+              "description_markers=['execute', 'shell command', 'host machine']",
+              "input_keys=['command']"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/insecure-server/server.py"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              },
+              "message": {
+                "text": "name_markers=['exec', 'command']"
+              }
+            }
+          ],
+          "rule": {
+            "id": "dangerous_exec_tool"
+          }
+        },
+        {
+          "ruleId": "dangerous_fs_write_tool",
+          "ruleIndex": 5,
+          "level": "error",
+          "message": {
+            "text": "Tool 'write_file' appears to provide filesystem write access."
+          },
+          "partialFingerprints": {
+            "primaryLocationLineHash": "4828ab4bad018e12f98728c62603e4abbbbab48d1235504194da21035fa55b4b"
+          },
+          "properties": {
+            "score_category": "tool_surface",
+            "score_impact": 20,
+            "tool_name": "write_file",
+            "finding_category": "capability",
+            "evidence": [
+              "write_markers=['write']",
+              "file_markers=['file', 'disk', 'path']",
+              "path_keys=['path']",
+              "content_keys=['content']"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/insecure-server/server.py"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              },
+              "message": {
+                "text": "write_markers=['write']"
+              }
+            }
+          ],
+          "rule": {
+            "id": "dangerous_fs_write_tool"
+          }
+        }
+      ]
+    }
+  ]
+}

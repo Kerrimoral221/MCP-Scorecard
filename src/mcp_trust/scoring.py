@@ -34,5 +34,13 @@ class ScoringEngine:
         """Produce a report for the given normalized server."""
         findings = self.collect_findings(server)
         score = self.build_score(findings)
-        return Report(server=server, findings=findings, score=score)
-
+        rule_descriptors = {
+            rule.rule_id: rule.to_descriptor()
+            for rule in self.registry
+        }
+        return Report(
+            server=server,
+            findings=findings,
+            score=score,
+            rule_descriptors=rule_descriptors,
+        )

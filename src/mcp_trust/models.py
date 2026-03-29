@@ -38,6 +38,24 @@ class FindingLevel(StrEnum):
     ERROR = "error"
 
 
+class FindingCategory(StrEnum):
+    """High-level category assigned to a deterministic finding."""
+
+    TOOL_IDENTITY = "tool-identity"
+    TOOL_DESCRIPTION = "tool-description"
+    INPUT_SCHEMA = "input-schema"
+    CAPABILITY = "capability"
+
+
+class ScoreCategory(StrEnum):
+    """Top-level scoring buckets exposed to users."""
+
+    SPEC = "spec"
+    AUTH = "auth"
+    SECRETS = "secrets"
+    TOOL_SURFACE = "tool_surface"
+
+
 @dataclass(slots=True, frozen=True)
 class NormalizedTool:
     """Normalized representation of a single MCP tool."""
@@ -92,6 +110,10 @@ class Finding:
     rule_id: str
     level: FindingLevel
     message: str
+    title: str | None = None
+    category: FindingCategory | None = None
+    score_category: ScoreCategory = ScoreCategory.TOOL_SURFACE
+    evidence: tuple[str, ...] = field(default_factory=tuple)
     penalty: int = 0
     tool_name: str | None = None
     metadata: dict[str, JSONValue] = field(default_factory=dict)
@@ -107,19 +129,73 @@ class Finding:
             "message",
             _normalize_required_text(self.message, field_name="finding message"),
         )
+        object.__setattr__(self, "title", _normalize_optional_text(self.title))
+        evidence = tuple(
+            _normalize_required_text(item, field_name="finding evidence item")
+            for item in self.evidence
+        )
+        object.__setattr__(self, "evidence", evidence)
         object.__setattr__(self, "tool_name", _normalize_optional_text(self.tool_name))
         object.__setattr__(self, "metadata", dict(self.metadata))
         if self.penalty < 0:
             raise ValueError("finding penalty must be greater than or equal to zero.")
 
+    @property
+    def severity(self) -> FindingLevel:
+        """Return the finding severity."""
+        return self.level
+
+    @property
+    def score_impact(self) -> int:
+        """Return the score impact associated with the finding."""
+        return self.penalty
+
 
 @dataclass(slots=True, frozen=True)
-class ScoreBreakdown:
-    """Aggregated trust score information for a report."""
+class RuleDescriptor:
+    """Stable rule metadata attached to a computed report."""
 
+    rule_id: str
+    name: str
+    summary: str
+    severity: FindingLevel
+    category: FindingCategory
+    score_category: ScoreCategory
+    score_impact: int
+    tags: tuple[str, ...] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "rule_id",
+            _normalize_required_text(self.rule_id, field_name="rule_id"),
+        )
+        object.__setattr__(
+            self,
+            "name",
+            _normalize_required_text(self.name, field_name="rule name"),
+        )
+        object.__setattr__(
+            self,
+            "summary",
+            _normalize_required_text(self.summary, field_name="rule summary"),
+        )
+        if self.score_impact < 0:
+            raise ValueError("rule score_impact must be greater than or equal to zero.")
+
+        tags = tuple(_normalize_required_text(tag, field_name="rule tag") for tag in self.tags)
+        object.__setattr__(self, "tags", tags)
+
+
+@dataclass(slots=True, frozen=True)
+class CategoryScoreBreakdown:
+    """Per-category score breakdown exposed in reports."""
+
+    category: ScoreCategory
     max_score: int
     penalty_points: int
-    final_score: int
+    score: int
+    finding_count: int
     rule_penalties: dict[str, int] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -127,10 +203,12 @@ class ScoreBreakdown:
             raise ValueError("max_score must be greater than or equal to zero.")
         if self.penalty_points < 0:
             raise ValueError("penalty_points must be greater than or equal to zero.")
-        if self.final_score < 0:
-            raise ValueError("final_score must be greater than or equal to zero.")
-        if self.final_score > self.max_score:
-            raise ValueError("final_score must not exceed max_score.")
+        if self.score < 0:
+            raise ValueError("score must be greater than or equal to zero.")
+        if self.score > self.max_score:
+            raise ValueError("score must not exceed max_score.")
+        if self.finding_count < 0:
+            raise ValueError("finding_count must be greater than or equal to zero.")
 
         penalties = dict(self.rule_penalties)
         for rule_id, penalty in penalties.items():
@@ -142,6 +220,62 @@ class ScoreBreakdown:
             raise ValueError("penalty_points must equal the sum of rule_penalties.")
 
         object.__setattr__(self, "rule_penalties", penalties)
+
+
+@dataclass(slots=True, frozen=True)
+class ScoreBreakdown:
+    """Aggregated trust score information for a report."""
+
+    max_score: int
+    total_penalty_points: int
+    total_score: int
+    category_breakdown: dict[ScoreCategory, CategoryScoreBreakdown] = field(default_factory=dict)
+    rule_penalties: dict[str, int] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if self.max_score < 0:
+            raise ValueError("max_score must be greater than or equal to zero.")
+        if self.total_penalty_points < 0:
+            raise ValueError("total_penalty_points must be greater than or equal to zero.")
+        if self.total_score < 0:
+            raise ValueError("total_score must be greater than or equal to zero.")
+        if self.total_score > self.max_score:
+            raise ValueError("total_score must not exceed max_score.")
+
+        penalties = dict(self.rule_penalties)
+        for rule_id, penalty in penalties.items():
+            _normalize_required_text(rule_id, field_name="rule penalty key")
+            if penalty < 0:
+                raise ValueError("rule penalties must be greater than or equal to zero.")
+
+        if sum(penalties.values()) != self.total_penalty_points:
+            raise ValueError("total_penalty_points must equal the sum of rule_penalties.")
+
+        normalized_category_breakdown = dict(self.category_breakdown)
+        expected_categories = set(ScoreCategory)
+        if set(normalized_category_breakdown) != expected_categories:
+            raise ValueError("category_breakdown must include every score category exactly once.")
+
+        category_penalty_points = sum(
+            breakdown.penalty_points for breakdown in normalized_category_breakdown.values()
+        )
+        if category_penalty_points != self.total_penalty_points:
+            raise ValueError(
+                "total_penalty_points must equal the sum of category breakdown penalties."
+            )
+
+        object.__setattr__(self, "rule_penalties", penalties)
+        object.__setattr__(self, "category_breakdown", normalized_category_breakdown)
+
+    @property
+    def penalty_points(self) -> int:
+        """Compatibility alias for total penalty points."""
+        return self.total_penalty_points
+
+    @property
+    def final_score(self) -> int:
+        """Compatibility alias for the total score."""
+        return self.total_score
 
     @classmethod
     def from_findings(
@@ -155,18 +289,46 @@ class ScoreBreakdown:
             raise ValueError("max_score must be greater than or equal to zero.")
 
         rule_penalties: dict[str, int] = {}
+        category_penalties: dict[ScoreCategory, int] = {
+            category: 0 for category in ScoreCategory
+        }
+        category_rule_penalties: dict[ScoreCategory, dict[str, int]] = {
+            category: {} for category in ScoreCategory
+        }
+        category_finding_counts: dict[ScoreCategory, int] = {
+            category: 0 for category in ScoreCategory
+        }
+
         for finding in findings:
             rule_penalties[finding.rule_id] = (
                 rule_penalties.get(finding.rule_id, 0) + finding.penalty
             )
+            category_penalties[finding.score_category] += finding.penalty
+            category_finding_counts[finding.score_category] += 1
+            category_rule_penalties[finding.score_category][finding.rule_id] = (
+                category_rule_penalties[finding.score_category].get(finding.rule_id, 0)
+                + finding.penalty
+            )
 
-        penalty_points = sum(rule_penalties.values())
-        final_score = max(max_score - penalty_points, 0)
+        total_penalty_points = sum(rule_penalties.values())
+        total_score = max(max_score - total_penalty_points, 0)
+        category_breakdown = {
+            category: CategoryScoreBreakdown(
+                category=category,
+                max_score=max_score,
+                penalty_points=category_penalties[category],
+                score=max(max_score - category_penalties[category], 0),
+                finding_count=category_finding_counts[category],
+                rule_penalties=category_rule_penalties[category],
+            )
+            for category in ScoreCategory
+        }
 
         return cls(
             max_score=max_score,
-            penalty_points=penalty_points,
-            final_score=final_score,
+            total_penalty_points=total_penalty_points,
+            total_score=total_score,
+            category_breakdown=category_breakdown,
             rule_penalties=rule_penalties,
         )
 
@@ -178,6 +340,7 @@ class Report:
     server: NormalizedServer
     findings: tuple[Finding, ...]
     score: ScoreBreakdown
+    rule_descriptors: dict[str, RuleDescriptor] = field(default_factory=dict)
     generated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     schema_version: str = "0.3"
     toolkit_version: str = __version__
@@ -185,6 +348,7 @@ class Report:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "findings", tuple(self.findings))
+        object.__setattr__(self, "rule_descriptors", dict(self.rule_descriptors))
         object.__setattr__(
             self,
             "schema_version",
@@ -204,3 +368,8 @@ class Report:
     def finding_count(self) -> int:
         """Return the total number of findings in the report."""
         return len(self.findings)
+
+    @property
+    def total_score(self) -> int:
+        """Return the total score from the scoring breakdown."""
+        return self.score.total_score

@@ -1,0 +1,29 @@
+name: Example MCP Trust Scan
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  scan-demo-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run MCP Trust Kit
+        uses: ./
+        with:
+          cmd: python examples/insecure-server/server.py
+          min-score: "80"
+          json-out: mcp-trust-report.json
+          sarif-out: mcp-trust-report.sarif
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: mcp-trust-report.sarif

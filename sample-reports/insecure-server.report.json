@@ -1,0 +1,259 @@
+{
+  "schema_version": "0.3",
+  "toolkit_version": "0.3.0",
+  "generated_at": "2026-03-29T12:42:41.732915+00:00",
+  "server": {
+    "target": "stdio:[\".\\\\.venv\\\\Scripts\\\\python\",\"examples\\\\insecure-server\\\\server.py\"]",
+    "name": "Insecure Demo Server",
+    "version": "0.1.0",
+    "metadata": {
+      "mcp": {
+        "protocolVersion": "2025-11-25",
+        "capabilities": {
+          "tools": {}
+        },
+        "transport": "stdio",
+        "command": [
+          ".\\.venv\\Scripts\\python",
+          "examples\\insecure-server\\server.py"
+        ],
+        "instructions": "Demonstration-only MCP server with intentionally risky tools."
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "exec_command",
+      "description": "Execute an arbitrary shell command on the host machine.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "Shell command to execute exactly as provided."
+          }
+        },
+        "required": [
+          "command"
+        ],
+        "additionalProperties": false
+      },
+      "metadata": {}
+    },
+    {
+      "name": "write_file",
+      "description": "Write text content to any file path on disk.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or relative path to write."
+          },
+          "content": {
+            "type": "string",
+            "description": "Content to write to the target file."
+          },
+          "overwrite": {
+            "type": "boolean",
+            "description": "Overwrite the file if it already exists."
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ],
+        "additionalProperties": false
+      },
+      "metadata": {}
+    },
+    {
+      "name": "do_it",
+      "description": "Helps with stuff.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Thing to process."
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "additionalProperties": false
+      },
+      "metadata": {}
+    },
+    {
+      "name": "debug_payload",
+      "description": "Debug helper that accepts whatever input is available.",
+      "input_schema": {
+        "type": "object",
+        "description": "Arbitrary debug payload.",
+        "additionalProperties": true
+      },
+      "metadata": {}
+    }
+  ],
+  "findings": [
+    {
+      "rule_id": "vague_tool_description",
+      "title": "Vague tool description",
+      "severity": "warning",
+      "category": "tool-description",
+      "score_category": "tool_surface",
+      "tool_name": "do_it",
+      "message": "Tool 'do_it' uses a vague description that does not explain its behavior clearly.",
+      "evidence": [
+        "description='Helps with stuff.'",
+        "word_count=3",
+        "matched_phrase='helps with stuff'"
+      ],
+      "score_impact": 10,
+      "metadata": {}
+    },
+    {
+      "rule_id": "weak_input_schema",
+      "title": "Weak input schema",
+      "severity": "warning",
+      "category": "input-schema",
+      "score_category": "tool_surface",
+      "tool_name": "debug_payload",
+      "message": "Tool 'debug_payload' exposes a weak input schema that accepts poorly constrained input.",
+      "evidence": [
+        "additionalProperties=True",
+        "properties=<missing-or-empty>"
+      ],
+      "score_impact": 10,
+      "metadata": {}
+    },
+    {
+      "rule_id": "dangerous_exec_tool",
+      "title": "Dangerous execution tool",
+      "severity": "error",
+      "category": "capability",
+      "score_category": "tool_surface",
+      "tool_name": "exec_command",
+      "message": "Tool 'exec_command' appears to expose host command execution.",
+      "evidence": [
+        "name_markers=['exec', 'command']",
+        "description_markers=['execute', 'shell command', 'host machine']",
+        "input_keys=['command']"
+      ],
+      "score_impact": 20,
+      "metadata": {}
+    },
+    {
+      "rule_id": "dangerous_fs_write_tool",
+      "title": "Dangerous filesystem write tool",
+      "severity": "error",
+      "category": "capability",
+      "score_category": "tool_surface",
+      "tool_name": "write_file",
+      "message": "Tool 'write_file' appears to provide filesystem write access.",
+      "evidence": [
+        "write_markers=['write']",
+        "file_markers=['file', 'disk', 'path']",
+        "path_keys=['path']",
+        "content_keys=['content']"
+      ],
+      "score_impact": 20,
+      "metadata": {}
+    }
+  ],
+  "score": {
+    "total_score": 40,
+    "max_score": 100,
+    "penalty_points": 60,
+    "category_breakdown": {
+      "spec": {
+        "score": 100,
+        "max_score": 100,
+        "penalty_points": 0,
+        "finding_count": 0,
+        "rule_penalties": {}
+      },
+      "auth": {
+        "score": 100,
+        "max_score": 100,
+        "penalty_points": 0,
+        "finding_count": 0,
+        "rule_penalties": {}
+      },
+      "secrets": {
+        "score": 100,
+        "max_score": 100,
+        "penalty_points": 0,
+        "finding_count": 0,
+        "rule_penalties": {}
+      },
+      "tool_surface": {
+        "score": 40,
+        "max_score": 100,
+        "penalty_points": 60,
+        "finding_count": 4,
+        "rule_penalties": {
+          "vague_tool_description": 10,
+          "weak_input_schema": 10,
+          "dangerous_exec_tool": 20,
+          "dangerous_fs_write_tool": 20
+        }
+      }
+    },
+    "rule_penalties": {
+      "vague_tool_description": 10,
+      "weak_input_schema": 10,
+      "dangerous_exec_tool": 20,
+      "dangerous_fs_write_tool": 20
+    }
+  },
+  "summary": {
+    "tool_count": 4,
+    "finding_count": 4,
+    "severity_counts": {
+      "info": 0,
+      "warning": 2,
+      "error": 2
+    },
+    "top_findings": [
+      {
+        "rule_id": "vague_tool_description",
+        "title": "Vague tool description",
+        "severity": "warning",
+        "tool_name": "do_it",
+        "message": "Tool 'do_it' uses a vague description that does not explain its behavior clearly.",
+        "score_impact": 10
+      },
+      {
+        "rule_id": "weak_input_schema",
+        "title": "Weak input schema",
+        "severity": "warning",
+        "tool_name": "debug_payload",
+        "message": "Tool 'debug_payload' exposes a weak input schema that accepts poorly constrained input.",
+        "score_impact": 10
+      },
+      {
+        "rule_id": "dangerous_exec_tool",
+        "title": "Dangerous execution tool",
+        "severity": "error",
+        "tool_name": "exec_command",
+        "message": "Tool 'exec_command' appears to expose host command execution.",
+        "score_impact": 20
+      },
+      {
+        "rule_id": "dangerous_fs_write_tool",
+        "title": "Dangerous filesystem write tool",
+        "severity": "error",
+        "tool_name": "write_file",
+        "message": "Tool 'write_file' appears to provide filesystem write access.",
+        "score_impact": 20
+      }
+    ]
+  },
+  "total_score": 40,
+  "max_score": 100,
+  "penalty_points": 60,
+  "target": "stdio:[\".\\\\.venv\\\\Scripts\\\\python\",\"examples\\\\insecure-server\\\\server.py\"]",
+  "metadata": {}
+}

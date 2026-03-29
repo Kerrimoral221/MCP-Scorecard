@@ -5,12 +5,14 @@ from datetime import UTC, datetime
 import pytest
 
 from mcp_trust.models import (
+    CategoryScoreBreakdown,
     Finding,
     FindingLevel,
     NormalizedServer,
     NormalizedTool,
     Report,
     ScoreBreakdown,
+    ScoreCategory,
 )
 
 
@@ -62,11 +64,30 @@ def test_score_breakdown_aggregates_rule_penalties_and_clamps_to_zero() -> None:
     assert breakdown.penalty_points == 115
     assert breakdown.final_score == 0
     assert breakdown.rule_penalties == {"rule.alpha": 20, "rule.beta": 95}
+    assert breakdown.category_breakdown[ScoreCategory.TOOL_SURFACE].penalty_points == 115
+    assert breakdown.category_breakdown[ScoreCategory.TOOL_SURFACE].score == 0
+    assert breakdown.category_breakdown[ScoreCategory.SPEC].score == 100
 
 
 def test_report_requires_timezone_aware_timestamp() -> None:
     server = NormalizedServer(target="stdio://demo")
-    score = ScoreBreakdown(max_score=100, penalty_points=0, final_score=100)
+    empty_category_breakdown = {
+        category: CategoryScoreBreakdown(
+            category=category,
+            max_score=100,
+            penalty_points=0,
+            score=100,
+            finding_count=0,
+        )
+        for category in ScoreCategory
+    }
+    score = ScoreBreakdown(
+        max_score=100,
+        total_penalty_points=0,
+        total_score=100,
+        category_breakdown=empty_category_breakdown,
+        rule_penalties={},
+    )
 
     with pytest.raises(ValueError, match="timezone-aware"):
         Report(

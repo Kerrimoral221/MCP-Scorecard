@@ -1,0 +1,37 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_sample_reports_exist_and_match_current_demo_shape() -> None:
+    json_report = ROOT / "sample-reports" / "insecure-server.report.json"
+    sarif_report = ROOT / "sample-reports" / "insecure-server.report.sarif"
+    terminal_report = ROOT / "sample-reports" / "insecure-server.terminal.md"
+
+    json_data = json.loads(json_report.read_text(encoding="utf-8"))
+    sarif_data = json.loads(sarif_report.read_text(encoding="utf-8"))
+    terminal_text = terminal_report.read_text(encoding="utf-8")
+
+    assert json_data["server"]["name"] == "Insecure Demo Server"
+    assert json_data["total_score"] == 40
+    assert json_data["summary"]["finding_count"] == 4
+    assert sarif_data["version"] == "2.1.0"
+    assert len(sarif_data["runs"]) == 1
+    assert len(sarif_data["runs"][0]["results"]) == 4
+    assert "```text" in terminal_text
+    assert "Total Score: 40/100" in terminal_text
+
+
+def test_docs_and_readme_link_launch_assets() -> None:
+    architecture_doc = ROOT / "docs" / "architecture.md"
+    readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
+    architecture_text = architecture_doc.read_text(encoding="utf-8")
+
+    assert "```mermaid" in architecture_text
+    assert "sample-reports/insecure-server.report.json" in readme_text
+    assert "sample-reports/insecure-server.report.sarif" in readme_text
+    assert "sample-reports/insecure-server.terminal.md" in readme_text
+    assert "docs/architecture.md" in readme_text

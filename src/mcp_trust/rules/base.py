@@ -1,19 +1,90 @@
-"""Rule interface for deterministic trust scoring."""
+"""Base abstractions for deterministic trust scoring rules."""
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import Protocol
+from dataclasses import dataclass, field
 
-from mcp_trust.models import Finding, NormalizedServer
+from mcp_trust.models import (
+    Finding,
+    FindingCategory,
+    FindingLevel,
+    JSONValue,
+    NormalizedServer,
+    RuleDescriptor,
+    ScoreCategory,
+)
+
+SEVERITY_SCORE_IMPACT = {
+    FindingLevel.INFO: 0,
+    FindingLevel.WARNING: 10,
+    FindingLevel.ERROR: 20,
+}
 
 
-class Rule(Protocol):
-    """Deterministic rule that inspects a normalized server."""
+@dataclass(slots=True, frozen=True)
+class Rule(ABC):
+    """Base class for deterministic rules with explicit metadata."""
 
     rule_id: str
+    title: str
     summary: str
+    severity: FindingLevel
+    category: FindingCategory
+    score_category: ScoreCategory
+    tags: tuple[str, ...] = field(default_factory=tuple)
 
+    def __post_init__(self) -> None:
+        if not self.rule_id.strip():
+            raise ValueError("rule_id must not be empty.")
+        if not self.title.strip():
+            raise ValueError("rule title must not be empty.")
+        if not self.summary.strip():
+            raise ValueError("rule summary must not be empty.")
+        normalized_tags = tuple(tag.strip() for tag in self.tags if tag.strip())
+        object.__setattr__(self, "tags", normalized_tags)
+
+    @property
+    def score_impact(self) -> int:
+        """Return the penalty points implied by the rule severity."""
+        return SEVERITY_SCORE_IMPACT[self.severity]
+
+    def to_descriptor(self) -> RuleDescriptor:
+        """Return stable metadata for report serialization layers."""
+        return RuleDescriptor(
+            rule_id=self.rule_id,
+            name=self.title,
+            summary=self.summary,
+            severity=self.severity,
+            category=self.category,
+            score_category=self.score_category,
+            score_impact=self.score_impact,
+            tags=self.tags,
+        )
+
+    @abstractmethod
     def evaluate(self, server: NormalizedServer) -> Sequence[Finding]:
         """Return findings emitted for the given normalized server."""
 
+    def make_finding(
+        self,
+        message: str,
+        *,
+        evidence: Sequence[str],
+        tool_name: str | None = None,
+        metadata: dict[str, JSONValue] | None = None,
+    ) -> Finding:
+        """Construct a finding populated from the rule metadata."""
+        return Finding(
+            rule_id=self.rule_id,
+            level=self.severity,
+            title=self.title,
+            category=self.category,
+            score_category=self.score_category,
+            message=message,
+            evidence=tuple(evidence),
+            penalty=self.score_impact,
+            tool_name=tool_name,
+            metadata={} if metadata is None else metadata,
+        )

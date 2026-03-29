@@ -1,15 +1,28 @@
 from __future__ import annotations
 
-from mcp_trust.models import Finding, FindingLevel, NormalizedServer
+from mcp_trust.models import (
+    Finding,
+    FindingCategory,
+    FindingLevel,
+    NormalizedServer,
+    ScoreCategory,
+)
 from mcp_trust.rules import RuleRegistry
+from mcp_trust.rules.base import Rule
 
 
-class DummyRule:
+class DummyRule(Rule):
     """Simple test rule used to verify registry behavior."""
 
     def __init__(self, rule_id: str) -> None:
-        self.rule_id = rule_id
-        self.summary = f"Summary for {rule_id}"
+        super().__init__(
+            rule_id=rule_id,
+            title=f"Title for {rule_id}",
+            summary=f"Summary for {rule_id}",
+            severity=FindingLevel.INFO,
+            category=FindingCategory.TOOL_DESCRIPTION,
+            score_category=ScoreCategory.TOOL_SURFACE,
+        )
 
     def evaluate(self, server: NormalizedServer) -> list[Finding]:
         return [

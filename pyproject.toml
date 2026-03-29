@@ -7,7 +7,8 @@ name = "mcp-trust-kit"
 version = "0.3.0"
 description = "CI-first deterministic trust scoring for MCP servers."
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 authors = [
   { name = "MCP Trust Kit Contributors" },
@@ -16,7 +17,6 @@ keywords = ["mcp", "trust", "security", "scanner", "sarif", "github-actions"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
