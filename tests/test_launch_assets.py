@@ -27,11 +27,16 @@ def test_sample_reports_exist_and_match_current_demo_shape() -> None:
 
 def test_docs_and_readme_link_launch_assets() -> None:
     architecture_doc = ROOT / "docs" / "architecture.md"
+    validated_servers_doc = ROOT / "docs" / "validated-servers.md"
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     architecture_text = architecture_doc.read_text(encoding="utf-8")
+    validated_text = validated_servers_doc.read_text(encoding="utf-8")
 
     assert "```mermaid" in architecture_text
     assert "sample-reports/insecure-server.report.json" in readme_text
     assert "sample-reports/insecure-server.report.sarif" in readme_text
     assert "sample-reports/insecure-server.terminal.md" in readme_text
     assert "docs/architecture.md" in readme_text
+    assert "docs/validated-servers.md" in readme_text
+    assert "@modelcontextprotocol/server-memory@2026.1.26" in validated_text
+    assert "@modelcontextprotocol/server-filesystem@2026.1.14" in validated_text

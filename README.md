@@ -7,17 +7,35 @@
 
 **Deterministic trust scoring for MCP servers.**
 
-`MCP Trust Kit` scans a local MCP server over `stdio`, checks protocol and tool hygiene, flags
-risky tool surface, calculates a trust score, and writes terminal, JSON, and SARIF output.
+`MCP Trust Kit` is a CI-first scanner for MCP servers. It launches a server over `stdio`,
+discovers its tools, runs deterministic checks, calculates a trust score, and emits terminal,
+JSON, and SARIF output that fits cleanly into GitHub Actions.
 
 ## Why
 
-MCP servers expose tools to agents. Basic hygiene and risky capability review should be easy to
-run in CI.
+MCP servers expose tools to agents. Tool hygiene and risky tool surface should be reviewable with
+fast, repeatable checks.
 
-`MCP Trust Kit` gives you a fast, explainable signal before you wire a server into automation.
+`MCP Trust Kit` is built for that narrow job. It is not a gateway, a hosted service, or an opaque
+security product. It is a usable scanner with explainable output.
+
+## What It Does
+
+- launches a local MCP server over `stdio`
+- performs a minimal MCP handshake and tool discovery
+- normalizes tool metadata into a stable internal model
+- runs deterministic rules without LLMs
+- calculates a score from `0..100`
+- prints a short terminal summary
+- writes JSON for CI and integrations
+- writes SARIF for GitHub code scanning
+- fails CI when the score is below a threshold
+
+v0.3.0 is intentionally focused on local `stdio` servers.
 
 ## Quickstart Local
+
+Scan the included demo server:
 
 ```powershell
 python -m venv .venv
@@ -26,7 +44,7 @@ pip install -e .[dev]
 .\.venv\Scripts\mcp-trust scan --cmd .\.venv\Scripts\python examples\insecure-server\server.py
 ```
 
-Write JSON and SARIF and fail below a threshold:
+Generate reports and enforce a minimum score:
 
 ```powershell
 .\.venv\Scripts\mcp-trust scan `
@@ -37,6 +55,8 @@ Write JSON and SARIF and fail below a threshold:
 ```
 
 ## GitHub Actions Quickstart
+
+Drop this workflow into your repository:
 
 ```yaml
 name: MCP Trust Scan
@@ -95,16 +115,57 @@ Top Findings:
 - ERROR dangerous_fs_write_tool [write_file]: Tool 'write_file' appears to provide filesystem write access.
 ```
 
+## Validated On Real MCP Servers
+
+This repository includes a deterministic demo server, but the scanner has also been checked against
+real public MCP servers. This section is meant as a reproducibility note, not a leaderboard.
+
+Validated on `2026-03-29`:
+
+| Server | Source | Result | Notes |
+| --- | --- | --- | --- |
+| `examples/insecure-server` | local demo | `40/100` | intentionally risky demo fixture |
+| `@modelcontextprotocol/server-memory@2026.1.26` | official public package | `90/100` | one `weak_input_schema` finding on `read_graph` |
+| `@modelcontextprotocol/server-filesystem@2026.1.14` | official public package | `30/100` | write-capable tool surface is flagged, which is expected |
+
+Full commands, findings, and caveats:
+
+- [docs/validated-servers.md](docs/validated-servers.md)
+
 ## Rule Categories
 
-- Protocol and tool hygiene:
-  duplicate names, missing descriptions, vague descriptions, weak input schemas
-- Risky tool surface:
-  exec-like tools and filesystem write tools
-- Score buckets:
-  `spec`, `auth`, `secrets`, `tool_surface`
+Current v0.3.0 rules focus on two practical areas:
 
-## Examples And Sample Reports
+| Area | What it catches today |
+| --- | --- |
+| Protocol and tool hygiene | duplicate names, missing descriptions, vague descriptions, weak input schemas |
+| Risky tool surface | exec-like tools and filesystem write tools |
+
+Score breakdown is emitted across:
+
+- `spec`
+- `auth`
+- `secrets`
+- `tool_surface`
+
+## Scoring
+
+The scoring model is intentionally simple:
+
+1. start at `100`
+2. subtract fixed penalties for findings
+3. clamp to `0..100`
+4. compute category scores the same way
+
+Severity mapping in v0.3.0:
+
+| Severity | Penalty |
+| --- | --- |
+| `info` | `0` |
+| `warning` | `10` |
+| `error` | `20` |
+
+## Examples And Docs
 
 - [examples/insecure-server/README.md](examples/insecure-server/README.md)
 - [examples/fake_stdio_server.py](examples/fake_stdio_server.py)
@@ -112,13 +173,14 @@ Top Findings:
 - [sample-reports/insecure-server.report.sarif](sample-reports/insecure-server.report.sarif)
 - [sample-reports/insecure-server.terminal.md](sample-reports/insecure-server.terminal.md)
 - [docs/architecture.md](docs/architecture.md)
+- [docs/validated-servers.md](docs/validated-servers.md)
 - [.github/workflows/example.yml](.github/workflows/example.yml)
 
 ## Roadmap
 
 - expand deterministic rules for `spec`, `auth`, and `secrets`
-- improve SARIF location mapping where source context is available
-- add more sample reports and demo fixtures
+- improve SARIF location mapping where source context exists
+- add more sample reports and validation cases
 - keep the GitHub Action path simple and reliable
 
 ## Contributing
@@ -132,8 +194,12 @@ pip install -e .[dev]
 .\.venv\Scripts\python -m mypy
 ```
 
-Focused contributions are best: new deterministic rules, better `stdio` transport hardening,
-reporter improvements, docs, and examples.
+Good contribution areas:
+
+- new deterministic rules with tests
+- `stdio` transport hardening
+- reporter improvements that preserve stable output
+- docs and example workflows
 
 ## License
 
